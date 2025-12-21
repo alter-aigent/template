@@ -100,5 +100,36 @@ docker compose exec app alembic revision --autogenerate -m "message"
 - `app/models/` — модели (пример: `User`)
 - `alembic/` + `alembic.ini` — миграции
 - `docker-compose.yml` — app + postgres + healthchecks
+- `docker-compose.server.yml` — деплой на сервер (только app, база уже на сервере)
+
+## CI/CD (GitHub Actions)
+
+В репозитории есть:
+
+- `.github/workflows/ci.yml` — линт + тесты
+- `.github/workflows/deploy.yml` — деплой на сервер по SSH (сборка на сервере)
+
+### Настройка для деплоя
+
+1) В GitHub repo → **Settings → Secrets and variables → Actions** добавь:
+
+**Secrets**
+- `DEPLOY_SSH_KEY` — приватный SSH ключ для доступа на сервер (например содержимое `~/.ssh/aws_ed25519`)
+
+**Variables**
+- `DEPLOY_HOST` — IP/домен сервера (например `63.179.106.169`)
+- `DEPLOY_USER` — пользователь (например `ubuntu`)
+- `DEPLOY_PORT` — порт SSH (обычно `22`)
+
+Опционально (если хочешь другой каталог на сервере):
+- `DEPLOY_DIR` — путь на сервере, куда клонировать репозиторий (по умолчанию `/home/<DEPLOY_USER>/<repo-name>`)
+
+Опционально (переопределить внешний порт сервиса):
+- `SERVICE_PORT` — внешний порт, на который пробрасывать приложение (по умолчанию `8000`)
+
+2) На сервере должны быть установлены `docker` и `docker compose` (v2).  
+В workflow запуск идёт через `sudo`, как ты просил.
+
+3) Деплой запускается автоматически на каждый push в `main` (или вручную через **Actions → Deploy (server)**).
 
 

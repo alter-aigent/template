@@ -1,0 +1,49 @@
+name: Deploy (server)
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-main
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy via SSH (build on server)
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ vars.DEPLOY_HOST }}
+          username: ${{ vars.DEPLOY_USER }}
+          port: ${{ vars.DEPLOY_PORT }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            set -euo pipefail
+
+            REPO="${{ github.repository }}"
+            BRANCH="main"
+            DIR="${DEPLOY_DIR:-/home/${{ vars.DEPLOY_USER }}/${{ github.event.repository.name }}}"
+            SERVICE_PORT="${SERVICE_PORT:-8000}"
+
+            echo "Deploying $REPO@$BRANCH to $DIR (SERVICE_PORT=$SERVICE_PORT)"
+
+            mkdir -p "$DIR"
+
+            if [ ! -d "$DIR/.git" ]; then
+              git clone "https://github.com/$REPO.git" "$DIR"
+            fi
+
+            cd "$DIR"
+            git fetch origin "$BRANCH"
+            git reset --hard "origin/$BRANCH"
+
+            # Build and run service (DB already exists on server)
+            export SERVICE_PORT="$SERVICE_PORT"
+            sudo -E docker compose -f docker-compose.server.yml up -d --build
+
+            sudo docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+
+
