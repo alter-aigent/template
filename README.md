@@ -124,8 +124,7 @@ docker compose exec app alembic revision --autogenerate -m "message"
 Опционально (если хочешь другой каталог на сервере):
 - `DEPLOY_DIR` — путь на сервере, куда клонировать репозиторий (по умолчанию `/home/<DEPLOY_USER>/<repo-name>`)
 
-Опционально (переопределить внешний порт сервиса):
-- `SERVICE_PORT` — внешний порт, на который пробрасывать приложение (по умолчанию `8000`)
+Порт сервиса **захардкожен в пайплайне**: см. `.github/workflows/deploy.yml` (переменная `SERVICE_PORT` внутри script).
 
 2) На сервере должны быть установлены `docker` и `docker compose` (v2).  
 В workflow запуск идёт через `sudo`, как ты просил.

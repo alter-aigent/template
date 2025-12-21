@@ -26,7 +26,8 @@ jobs:
             REPO="${{ github.repository }}"
             BRANCH="main"
             DIR="${DEPLOY_DIR:-/home/${{ vars.DEPLOY_USER }}/${{ github.event.repository.name }}}"
-            SERVICE_PORT="${SERVICE_PORT:-8000}"
+            # Hardcoded external port for this template. Change here if you need a different one.
+            SERVICE_PORT="8000"
 
             echo "Deploying $REPO@$BRANCH to $DIR (SERVICE_PORT=$SERVICE_PORT)"
 
