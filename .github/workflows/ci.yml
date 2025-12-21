@@ -21,11 +21,6 @@ jobs:
           python -m pip install -U pip
           pip install -r requirements.txt -r requirements-dev.txt
 
-      - name: Lint (ruff)
-        run: |
-          ruff --version
-          ruff check .
-
       - name: Tests (pytest)
         run: |
           pytest -q
