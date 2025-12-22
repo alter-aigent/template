@@ -1,8 +1,9 @@
 name: Deploy (server)
 
 on:
-  push:
+  pull_request:
     branches: [ "main" ]
+    types: [ "closed" ]
   workflow_dispatch:
 
 concurrency:
@@ -12,6 +13,7 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true }}
     steps:
       - name: Deploy via SSH (build on server)
         uses: appleboy/ssh-action@v1.0.3
@@ -43,6 +45,11 @@ jobs:
 
             # Build and run service (DB already exists on server)
             export SERVICE_PORT="$SERVICE_PORT"
+            # Ensure external port is free (training env, be aggressive)
+            sudo docker ps --filter "publish=${SERVICE_PORT}" -q | xargs -r sudo docker rm -f
+
+            # Clean old compose resources for this project, then start
+            sudo -E docker compose -f docker-compose.server.yml down --remove-orphans || true
             sudo -E docker compose -f docker-compose.server.yml up -d --build
 
             sudo docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"

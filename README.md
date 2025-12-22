@@ -97,7 +97,7 @@ docker compose exec app alembic revision --autogenerate -m "message"
 - `app/main.py` — точка входа FastAPI
 - `app/api/health.py` — health-check endpoint
 - `app/db/session.py` — async engine/session
-- `app/models/` — модели (пример: `User`)
+- `app/models/` — модели
 - `alembic/` + `alembic.ini` — миграции
 - `docker-compose.yml` — app + postgres + healthchecks
 - `docker-compose.server.yml` — деплой на сервер (только app, база уже на сервере)
@@ -106,7 +106,7 @@ docker compose exec app alembic revision --autogenerate -m "message"
 
 В репозитории есть:
 
-- `.github/workflows/ci.yml` — линт + тесты
+- `.github/workflows/ci.yml` — тесты
 - `.github/workflows/deploy.yml` — деплой на сервер по SSH (сборка на сервере)
 
 ### Настройка для деплоя
@@ -129,6 +129,6 @@ docker compose exec app alembic revision --autogenerate -m "message"
 2) На сервере должны быть установлены `docker` и `docker compose` (v2).  
 В workflow запуск идёт через `sudo`, как ты просил.
 
-3) Деплой запускается автоматически на каждый push в `main` (или вручную через **Actions → Deploy (server)**).
+3) Деплой запускается при **merge PR в `main`** (или вручную через **Actions → Deploy (server)**).
 
 
