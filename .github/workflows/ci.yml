@@ -2,6 +2,12 @@ name: CI
 
 on:
   pull_request:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Branch to run tests on'
+        required: false
+        type: string
 
 jobs:
   test:
@@ -23,5 +29,3 @@ jobs:
       - name: Tests (pytest)
         run: |
           pytest -q
-
-
